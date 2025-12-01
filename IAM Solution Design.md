@@ -31,25 +31,19 @@ We will move TechCorp from a "Ticket-Based" provisioning model to a "Rule-Based"
 
 ```mermaid
 graph TD
-    %% Define Styles
-    classDef azure fill:#0072C6,stroke:#fff,stroke-width:2px,color:#fff;
-    classDef hr fill:#FFB900,stroke:#333,stroke-width:2px;
-    classDef security fill:#D83B01,stroke:#fff,stroke-width:2px,color:#fff;
-    classDef user fill:#505050,stroke:#fff,stroke-width:2px,color:#fff;
-
     %% Nodes
-    HR[HR System (SAP/Workday)]:::hr
-    User((User / Employee)):::user
+    HR["HR System (SAP/Workday)"]
+    User(("User / Employee"))
     
     subgraph Microsoft_Entra_ID [Microsoft Entra ID Core]
-        AAD[Identity Tenant]:::azure
-        Engine[Provisioning Engine]:::azure
-        CAP{Conditional Access<br/>Policy}:::security
+        AAD["Identity Tenant"]
+        Engine["Provisioning Engine"]
+        CAP{"Conditional Access<br/>Policy"}
     end
 
     subgraph Target_Systems [Target Resources]
-        SaaS[SaaS Apps<br/>(Salesforce/Office 365)]
-        OnPrem[Legacy Windows Apps]
+        SaaS["SaaS Apps<br/>(Salesforce/Office 365)"]
+        OnPrem["Legacy Windows Apps"]
     end
 
     %% Workflow Connections
@@ -62,8 +56,20 @@ graph TD
     AAD -->|6. Evaluate Risk| CAP
     
     %% Logic Gates
-    CAP -- High Risk / Bad Location --> Block[❌ Block Access]:::security
-    CAP -- Compliant Device + MFA --> Allow[✅ Grant Access]:::azure
+    CAP -- High Risk / Bad Location --> Block["❌ Block Access"]
+    CAP -- Compliant Device + MFA --> Allow["✅ Grant Access"]
+
+    %% Define Styles
+    classDef azure fill:#0072C6,stroke:#fff,stroke-width:2px,color:#fff
+    classDef hr fill:#FFB900,stroke:#333,stroke-width:2px
+    classDef security fill:#D83B01,stroke:#fff,stroke-width:2px,color:#fff
+    classDef user fill:#505050,stroke:#fff,stroke-width:2px,color:#fff
+
+    %% Apply Styles
+    class HR hr
+    class User user
+    class AAD,Engine,Allow azure
+    class CAP,Block security
 ```
 
 > **Rationale:** Automation ensures instant productivity for new hires (Joiners) and instant revocation of access for terminated employees (Leavers).
