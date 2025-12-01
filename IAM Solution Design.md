@@ -27,6 +27,45 @@ We will move TechCorp from a "Ticket-Based" provisioning model to a "Rule-Based"
 3.  **SCIM Bridging:**
     * Utilize **SCIM protocol** to push identities from Entra ID into downstream SaaS apps (Salesforce, Slack) automatically.
 
+### System Architecture Diagram
+
+```mermaid
+graph TD
+    %% Define Styles
+    classDef azure fill:#0072C6,stroke:#fff,stroke-width:2px,color:#fff;
+    classDef hr fill:#FFB900,stroke:#333,stroke-width:2px;
+    classDef security fill:#D83B01,stroke:#fff,stroke-width:2px,color:#fff;
+    classDef user fill:#505050,stroke:#fff,stroke-width:2px,color:#fff;
+
+    %% Nodes
+    HR[HR System (SAP/Workday)]:::hr
+    User((User / Employee)):::user
+    
+    subgraph Microsoft_Entra_ID [Microsoft Entra ID Core]
+        AAD[Identity Tenant]:::azure
+        Engine[Provisioning Engine]:::azure
+        CAP{Conditional Access<br/>Policy}:::security
+    end
+
+    subgraph Target_Systems [Target Resources]
+        SaaS[SaaS Apps<br/>(Salesforce/Office 365)]
+        OnPrem[Legacy Windows Apps]
+    end
+
+    %% Workflow Connections
+    HR -->|1. New Hire Record| Engine
+    Engine -->|2. Auto-Create Account| AAD
+    AAD -->|3. SCIM Provisioning| SaaS
+    AAD -->|4. Connector Agent| OnPrem
+
+    User -->|5. Attempt Login| AAD
+    AAD -->|6. Evaluate Risk| CAP
+    
+    %% Logic Gates
+    CAP -- High Risk / Bad Location --> Block[❌ Block Access]:::security
+    CAP -- Compliant Device + MFA --> Allow[✅ Grant Access]:::azure
+```
+
 > **Rationale:** Automation ensures instant productivity for new hires (Joiners) and instant revocation of access for terminated employees (Leavers).
 
 ---
